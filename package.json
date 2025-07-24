@@ -1,0 +1,48 @@
+{
+  "name": "mygourd",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imkunet/mygourd.git"
+  },
+  "module": "lib/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun build.ts",
+    "prepack": "bun build.ts",
+    "lint": "eslint --fix",
+    "format": "prettier -w ."
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./events": {
+      "import": "./dist/events/index.js",
+      "types": "./dist/events/index.d.ts"
+    },
+    "./interactions": {
+      "import": "./dist/interactions/index.js",
+      "types": "./dist/interactions/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@hiddenability/opinionated-defaults": "^0.1.1",
+    "@types/bun": "latest",
+    "esbuild": "^0.25.8"
+  },
+  "dependencies": {
+    "arktype": "^2.1.20",
+    "consola": "^3.4.2",
+    "discord.js": "^14.21.0"
+  }
+}
