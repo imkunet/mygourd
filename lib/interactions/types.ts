@@ -24,7 +24,7 @@ export type InteractionType =
 
 export type InteractionDefinition<T extends InteractionType> = {
   definition: InteractionShapeMapper[T];
-  handler: (event: InteractionEventMapper[T]) => Promise<void> | void;
+  handler: (event: InteractionEventMapper[T]) => unknown;
 };
 
 export type InteractionModule = Module & {
