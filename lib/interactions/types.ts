@@ -12,8 +12,8 @@ export type InteractionEventMapper = {
 };
 
 export type InteractionShapeMapper = {
-  commands: SlashCommandBuilder;
-  menus: ContextMenuCommandBuilder;
+  commands: SerializableShape | SlashCommandBuilder;
+  menus: ContextMenuCommandBuilder | SerializableShape;
 };
 
 export type InteractionType =
