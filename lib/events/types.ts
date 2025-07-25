@@ -6,7 +6,7 @@ export type EventModule = Module & {
 };
 
 export type EventModuleShape = Partial<{
-  [K in keyof ClientEvents]: (...args: ClientEvents[K]) => void;
+  [K in keyof ClientEvents]: (...args: ClientEvents[K]) => Promise<void> | void;
 }>;
 
 export type EventModuleShapeFull = EventModuleShape & {

@@ -76,9 +76,9 @@ export const registerInteractionRouters = async (
       client.on(`interactionCreate`, async (interaction) => {
         if (!predicateMapper[key](interaction)) return;
         // actual crisis in understanding of TS
-        definition.forEach((v) => {
+        definition.forEach(async (v) => {
           if (v.definition.name === interaction.commandName)
-            v.handler(interaction as never);
+            await v.handler(interaction as never);
         });
       });
 
