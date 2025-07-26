@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 
 import { interactionModuleBrand } from '@/routers/symbols';
-import { glob } from '@/utils';
+import { entries, glob } from '@/utils';
 
 import type {
   InteractionDefinition,
@@ -62,10 +62,10 @@ export const registerInteractionRouters = async (
   modules: InteractionModule[],
 ): Promise<APIApplicationCommand[]> => {
   const definitions = modules
-    .flatMap((v) => Object.entries(v))
+    .flatMap((v) => entries(v))
     .map(([key, definition]) => {
       client.on(`interactionCreate`, (interaction) => {
-        if (!predicateMapper[key as InteractionType](interaction)) return;
+        if (!predicateMapper[key](interaction)) return;
         // actual crisis in understanding of TS
         definition.forEach(async (v) => {
           if (v.definition.name === interaction.commandName)
