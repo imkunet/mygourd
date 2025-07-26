@@ -17,16 +17,20 @@ type ModuleType = EventModule | InteractionModule;
 const shapeHandlers = [
   {
     check: isEventModule,
-    handler: (client: Client, module: ModuleType) => {
-      if (!isEventModule(module)) return;
-      registerEventRouters(client, [module]);
+    handler: (client: Client, modules: ModuleType[]) => {
+      registerEventRouters(
+        client,
+        modules.filter((v) => isEventModule(v)),
+      );
     },
   },
   {
     check: isInteractionModule,
-    handler: (client: Client, module: ModuleType) => {
-      if (!isInteractionModule(module)) return;
-      registerInteractionRouters(client, [module]);
+    handler: (client: Client, modules: ModuleType[]) => {
+      registerInteractionRouters(
+        client,
+        modules.filter((v) => isInteractionModule(v)),
+      );
     },
   },
 ] as const;
@@ -44,10 +48,11 @@ export const globRegisterAll = async (
       .map((module) => ({ module, path })),
   );
 
-  valid.forEach(({ module }) => {
-    shapeHandlers.forEach(({ handler }) => {
-      handler(client, module);
-    });
+  shapeHandlers.forEach(({ handler }) => {
+    handler(
+      client,
+      valid.map(({ module }) => module as ModuleType),
+    );
   });
 
   return valid;
