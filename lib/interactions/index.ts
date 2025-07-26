@@ -64,7 +64,7 @@ export const registerInteractionRouters = async (
   const definitions = modules
     .flatMap((v) => Object.entries(v))
     .map(([key, definition]) => {
-      client.on(`interactionCreate`, async (interaction) => {
+      client.on(`interactionCreate`, (interaction) => {
         if (!predicateMapper[key as InteractionType](interaction)) return;
         // actual crisis in understanding of TS
         definition.forEach(async (v) => {
@@ -91,7 +91,7 @@ export const registerInteractionRouters = async (
   // this has to be cursed luckily I'm the only one using this library...
   // right?
   const applicationId = client?.user?.id;
-  if (applicationId) register(applicationId);
+  if (applicationId) await register(applicationId);
 
   client.once(`ready`, (c) => register(c.user.id));
   return results;
@@ -109,7 +109,7 @@ export const globInteractionRouters = async (
       .map((module) => ({ module, path })),
   );
 
-  registerInteractionRouters(
+  await registerInteractionRouters(
     client,
     valid.map(({ module }) => module),
   );

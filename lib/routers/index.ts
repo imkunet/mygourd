@@ -26,8 +26,8 @@ const shapeHandlers = [
   },
   {
     check: isInteractionModule,
-    handler: (client: Client, modules: ModuleType[]) => {
-      registerInteractionRouters(
+    handler: async (client: Client, modules: ModuleType[]) => {
+      await registerInteractionRouters(
         client,
         modules.filter((v) => isInteractionModule(v)),
       );
@@ -45,13 +45,13 @@ export const globAllRouters = async (
   const valid = globbed.flat().flatMap(({ module, path }) =>
     Object.values(module)
       .filter((v) => shapeHandlers.some(({ check }) => check(v)))
-      .map((module) => ({ module, path })),
+      .map((module) => ({ module: module as ModuleType, path })),
   );
 
-  shapeHandlers.forEach(({ handler }) => {
-    handler(
+  shapeHandlers.forEach(async ({ handler }) => {
+    await handler(
       client,
-      valid.map(({ module }) => module as ModuleType),
+      valid.map(({ module }) => module),
     );
   });
 
