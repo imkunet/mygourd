@@ -9,9 +9,10 @@ so check out this example:
 ```ts
 // main.ts
 import { type } from 'arktype';
+import consola from 'consola';
 import { Client } from 'discord.js';
 import { globAllRouters } from 'mygourd/routers';
-import { useEnv } from 'mygourd/utils';
+import { login, useEnv } from 'mygourd/utils';
 
 const env = useEnv({
   BOT_TOKEN: type(/[A-Za-z.]/).configure({ actual: `` }),
@@ -27,7 +28,9 @@ await globAllRouters(
   import.meta.dir,
 );
 
-await client.login(env.BOT_TOKEN);
+await login(client, env.BOT_TOKEN, () => {
+  consola.info(`Shutting down!`);
+});
 
 // events/login.ts
 import consola from 'consola';
