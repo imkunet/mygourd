@@ -5,13 +5,13 @@ import {
   Routes,
 } from 'discord.js';
 
-import { entries, glob } from '@/utils';
+import { interactionModuleBrand } from '@/routers/symbols';
+import { glob } from '@/utils';
 
 import type {
   InteractionDefinition,
   InteractionModule,
   InteractionModuleShape,
-  InteractionModuleShapeFull,
   InteractionType,
 } from './types';
 
@@ -19,9 +19,9 @@ export * from './types';
 
 export const createInteractionRouter = (
   module: InteractionModuleShape,
-): InteractionModuleShapeFull => ({
+): InteractionModule => ({
   ...module,
-  __mygourd: `interaction`,
+  [interactionModuleBrand]: true,
 });
 
 const createSingle = <T extends InteractionType>(
@@ -40,19 +40,13 @@ export const createInteractionRouterMenu = (
   menu: InteractionDefinition<`menus`>,
 ) => createSingle(`menus`, menu);
 
-const toShape = (
-  v: InteractionModule | InteractionModuleShapeFull,
-): InteractionModuleShapeFull => (v as InteractionModule)?.default ?? v;
-
-const isShape = (
-  v: InteractionModuleShapeFull,
-): v is InteractionModuleShapeFull =>
-  typeof v === `object` && v.__mygourd === `interaction`;
+export const isInteractionModule = (v: unknown): v is InteractionModule =>
+  v !== null && typeof v === `object` && interactionModuleBrand in v;
 
 const predicateMapper = {
   commands: (event: Interaction) => event.isChatInputCommand(),
   menus: (event: Interaction) => event.isContextMenuCommand(),
-};
+} as const;
 
 /**
  * This is probably the most scuffed function here
@@ -65,16 +59,13 @@ const predicateMapper = {
  */
 export const registerInteractionRouters = async (
   client: Client,
-  modules: (InteractionModule | InteractionModuleShapeFull)[],
+  modules: InteractionModule[],
 ): Promise<APIApplicationCommand[]> => {
   const definitions = modules
-    .map((v) => toShape(v))
-    .filter((v) => isShape(v))
-    .map(({ __mygourd, ...shape }) => shape)
-    .flatMap((v) => entries(v))
+    .flatMap((v) => Object.entries(v))
     .map(([key, definition]) => {
       client.on(`interactionCreate`, async (interaction) => {
-        if (!predicateMapper[key](interaction)) return;
+        if (!predicateMapper[key as InteractionType](interaction)) return;
         // actual crisis in understanding of TS
         definition.forEach(async (v) => {
           if (v.definition.name === interaction.commandName)
@@ -111,14 +102,17 @@ export const globInteractionRouters = async (
   pattern: string,
   baseDir?: string,
 ) => {
-  const discovered = await glob<InteractionModule>(pattern, baseDir);
+  const discovered = await glob(pattern, baseDir);
+  const valid = discovered.flatMap(({ module, path }) =>
+    Object.values(module)
+      .filter((v) => isInteractionModule(v))
+      .map((module) => ({ module, path })),
+  );
 
   registerInteractionRouters(
     client,
-    discovered.map(({ module }) => module),
+    valid.map(({ module }) => module),
   );
 
-  return discovered
-    .map(({ module, path }) => ({ path, shape: toShape(module) }))
-    .filter(({ shape }) => isShape(shape));
+  return valid;
 };

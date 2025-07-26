@@ -27,6 +27,10 @@
       "import": "./dist/interactions/index.js",
       "types": "./dist/interactions/index.d.ts"
     },
+    "./routers": {
+      "import": "./dist/routers/index.js",
+      "types": "./dist/routers/index.d.ts"
+    },
     "./utils": {
       "import": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts"

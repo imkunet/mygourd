@@ -22,8 +22,11 @@ const client = new Client({
   intents: [`Guilds`, `MessageContent`, `GuildMessages`, `GuildVoiceStates`],
 });
 
-await globEventRouters(client, `events/**/*.ts`, import.meta.dir);
-await globInteractionRouters(client, `interactions/**/*.ts`, import.meta.dir);
+await globRegisterAll(
+  client,
+  [`events/**/*.ts`, `interactions/**/*.ts`],
+  import.meta.dir,
+);
 
 await client.login(env.BOT_TOKEN);
 
@@ -31,9 +34,15 @@ await client.login(env.BOT_TOKEN);
 import consola from 'consola';
 import { createEventRouter } from 'mygourd/events';
 
-export default createEventRouter({
+export const loginEvents = createEventRouter({
   ready: () => {
     consola.info(`The bot is ready!`);
+  },
+});
+
+export const loginEvents2 = createEventRouter({
+  ready: () => {
+    consola.info(`The bot is ready, but in a different router!`);
   },
 });
 
@@ -41,7 +50,7 @@ export default createEventRouter({
 import { SlashCommandBuilder } from 'discord.js';
 import { createInteractionRouterCommand } from 'mygourd/interactions';
 
-export default createInteractionRouterCommand({
+export const pingCommand = createInteractionRouterCommand({
   definition: new SlashCommandBuilder()
     .setName(`ping`)
     .setDescription(`Pings the bot!`),

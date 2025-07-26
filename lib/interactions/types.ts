@@ -4,7 +4,8 @@ import {
   ContextMenuCommandInteraction,
   SlashCommandBuilder,
 } from 'discord.js';
-import Module from 'node:module';
+
+import type { interactionModuleBrand } from '@/routers/symbols';
 
 export type InteractionEventMapper = {
   commands: ChatInputCommandInteraction;
@@ -27,16 +28,12 @@ export type InteractionDefinition<T extends InteractionType> = {
   handler: (event: InteractionEventMapper[T]) => unknown;
 };
 
-export type InteractionModule = Module & {
-  default: InteractionModuleShapeFull;
+export type InteractionModule = InteractionModuleShape & {
+  [interactionModuleBrand]: true;
 };
 
 export type InteractionModuleShape = Partial<{
   [T in InteractionType]: InteractionDefinition<T>[];
 }>;
-
-export type InteractionModuleShapeFull = InteractionModuleShape & {
-  __mygourd: `interaction`;
-};
 
 export type SerializableShape = { name: string; toJSON(): unknown };

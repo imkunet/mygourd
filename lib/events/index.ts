@@ -1,36 +1,21 @@
 import type { Client } from 'discord.js';
 
+import { eventModuleBrand } from '@/routers/symbols';
 import { glob } from '@/utils';
 
-import type {
-  EventModule,
-  EventModuleShape,
-  EventModuleShapeFull,
-} from './types';
+import type { EventModule, EventModuleShape } from './types';
 
 export * from './types';
 
-export const createEventRouter = (
-  module: EventModuleShape,
-): EventModuleShapeFull => ({
-  ...module,
-  __mygourd: `events`,
-});
+export const createEventRouter = (module: EventModuleShape): EventModule =>
+  Object.assign({ ...module }, { [eventModuleBrand]: true as const });
 
-const toShape = (v: EventModule | EventModuleShapeFull): EventModuleShapeFull =>
-  (v as EventModule)?.default ?? v;
+export const isEventModule = (v: unknown): v is EventModule =>
+  typeof v === `object` && v !== null && eventModuleBrand in v;
 
-const isShape = (v: EventModuleShapeFull): v is EventModuleShapeFull =>
-  typeof v === `object` && v.__mygourd === `events`;
-
-export const registerEventRouters = (
-  client: Client,
-  modules: (EventModule | EventModuleShapeFull)[],
-) =>
+export const registerEventRouters = (client: Client, modules: EventModule[]) =>
   modules
-    .map((v) => toShape(v))
-    .filter((v) => isShape(v))
-    .map(({ __mygourd, ...shape }) => shape)
+    .map(({ ...shape }) => shape)
     .flatMap((v) => Object.entries(v))
     .forEach((v) => client.on(...v));
 
@@ -39,14 +24,17 @@ export const globEventRouters = async (
   pattern: string,
   baseDir?: string,
 ) => {
-  const discovered = await glob<EventModule>(pattern, baseDir);
+  const discovered = await glob(pattern, baseDir);
+  const valid = discovered.flatMap(({ module, path }) =>
+    Object.values(module)
+      .filter((v) => isEventModule(v))
+      .map((module) => ({ module, path })),
+  );
 
   registerEventRouters(
     client,
-    discovered.map(({ module }) => module),
+    valid.map(({ module }) => module),
   );
 
-  return discovered
-    .map(({ module, path }) => ({ path, shape: toShape(module) }))
-    .filter(({ shape }) => isShape(shape));
+  return valid;
 };
