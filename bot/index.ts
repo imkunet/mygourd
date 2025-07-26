@@ -1,8 +1,7 @@
 import { type } from 'arktype';
 import { Client } from 'discord.js';
+import { globAllRouters } from 'mygourd/routers';
 import { useEnv } from 'mygourd/utils';
-
-import { globRegisterAll } from '../dist/routers';
 
 const env = useEnv({
   BOT_TOKEN: type(/[A-Za-z.]/).configure({ actual: `` }),
@@ -12,7 +11,7 @@ const client = new Client({
   intents: [`Guilds`, `MessageContent`, `GuildMessages`, `GuildVoiceStates`],
 });
 
-await globRegisterAll(
+await globAllRouters(
   client,
   [`events/**/*.ts`, `interactions/**/*.ts`],
   import.meta.dir,

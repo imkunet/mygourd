@@ -10,8 +10,7 @@ so check out this example:
 // main.ts
 import { type } from 'arktype';
 import { Client } from 'discord.js';
-import { globEventRouters } from 'mygourd/events';
-import { globInteractionRouters } from 'mygourd/interactions';
+import { globAllRouters } from 'mygourd/routers';
 import { useEnv } from 'mygourd/utils';
 
 const env = useEnv({
@@ -22,7 +21,7 @@ const client = new Client({
   intents: [`Guilds`, `MessageContent`, `GuildMessages`, `GuildVoiceStates`],
 });
 
-await globRegisterAll(
+await globAllRouters(
   client,
   [`events/**/*.ts`, `interactions/**/*.ts`],
   import.meta.dir,

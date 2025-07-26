@@ -35,7 +35,7 @@ const shapeHandlers = [
   },
 ] as const;
 
-export const globRegisterAll = async (
+export const globAllRouters = async (
   client: Client,
   pattern: string | string[],
   baseDir?: string,
