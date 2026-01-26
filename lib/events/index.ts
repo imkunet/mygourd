@@ -17,7 +17,10 @@ export const registerEventRouters = (client: Client, modules: EventModule[]) =>
   modules
     .map(({ ...shape }) => shape)
     .flatMap((v) => Object.entries(v))
-    .forEach((v) => client.on(...v));
+    .forEach((v) => {
+      client.setMaxListeners(client.getMaxListeners() + 1);
+      client.on(...v);
+    });
 
 export const globEventRouters = async (
   client: Client,

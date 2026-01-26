@@ -64,6 +64,7 @@ export const registerInteractionRouters = async (
   const definitions = modules
     .flatMap((v) => entries(v))
     .map(([key, definition]) => {
+      client.setMaxListeners(client.getMaxListeners() + 1);
       client.on(`interactionCreate`, (interaction) => {
         if (!predicateMapper[key](interaction)) return;
         // actual crisis in understanding of TS
@@ -93,6 +94,7 @@ export const registerInteractionRouters = async (
   const applicationId = client?.user?.id;
   if (applicationId) await register(applicationId);
 
+  client.setMaxListeners(client.getMaxListeners() + 1);
   client.once(`clientReady`, (c) => register(c.user.id));
   return results;
 };
