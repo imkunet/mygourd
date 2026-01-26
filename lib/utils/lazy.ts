@@ -4,7 +4,7 @@
  * @returns Lazy value fetcher
  */
 export const lazy = <LazyValue, FetcherArgs extends unknown[] = []>(
-  fetcher: (...args: FetcherArgs) => Promise<LazyValue>,
+  fetcher: (..._args: FetcherArgs) => Promise<LazyValue>,
 ) => {
   let promise: Promise<LazyValue> | undefined;
   return (...args: FetcherArgs) => promise ?? (promise = fetcher(...args));

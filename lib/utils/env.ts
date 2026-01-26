@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 import { configure, type } from 'arktype';
 import consola from 'consola';
 
@@ -17,8 +18,8 @@ export const useEnv = <
 >(
   def: type.validate<def>,
 ): output => {
-  const r = type(def)(process.env);
-  if (!(r instanceof type.errors)) return r as output;
+  const r = type.raw(def)(process.env) as output | type.errors;
+  if (!(r instanceof type.errors)) return r;
 
   Object.entries(r.byPath).forEach(([k, v]) =>
     consola.error(`Environment variable '${k}' ${v.problem}`),

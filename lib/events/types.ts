@@ -7,5 +7,5 @@ export type EventModule = EventModuleShape & {
 };
 
 export type EventModuleShape = Partial<{
-  [K in keyof ClientEvents]: (...args: ClientEvents[K]) => unknown;
+  [K in keyof ClientEvents]: (..._args: ClientEvents[K]) => unknown;
 }>;

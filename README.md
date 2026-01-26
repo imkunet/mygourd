@@ -37,13 +37,13 @@ import consola from 'consola';
 import { createEventRouter } from 'mygourd/events';
 
 export const loginEvents = createEventRouter({
-  ready: () => {
+  clientReady: () => {
     consola.info(`The bot is ready!`);
   },
 });
 
 export const loginEvents2 = createEventRouter({
-  ready: () => {
+  clientReady: () => {
     consola.info(`The bot is ready, but in a different router!`);
   },
 });

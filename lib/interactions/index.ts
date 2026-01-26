@@ -93,7 +93,7 @@ export const registerInteractionRouters = async (
   const applicationId = client?.user?.id;
   if (applicationId) await register(applicationId);
 
-  client.once(`ready`, (c) => register(c.user.id));
+  client.once(`clientReady`, (c) => register(c.user.id));
   return results;
 };
 

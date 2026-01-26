@@ -3,12 +3,10 @@ import {
   eslintConfigBase,
   eslintConfigPerfectionist,
   eslintConfigPrettier,
-  eslintConfigTypescript,
 } from '@hiddenability/opinionated-defaults/eslint';
 
 export default eslintConfig([
   ...eslintConfigBase,
-  ...eslintConfigTypescript,
   ...eslintConfigPrettier,
   ...eslintConfigPerfectionist,
   {
@@ -16,7 +14,7 @@ export default eslintConfig([
       'perfectionist/sort-modules': [
         `warn`,
         {
-          partitionByComment: `^\\s?<.*`,
+          partitionByComment: String.raw`^\s?<.*`,
         },
       ],
       'unicorn/no-null': `off`,
