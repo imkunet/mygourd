@@ -5,8 +5,6 @@
  * @returns entries
  */
 export const entries = <T extends Record<string, unknown>>(o: T) =>
-  Object.entries(o).filter(
-    ([k, v]) => typeof k !== `symbol` && v !== undefined,
-  ) as {
+  Object.entries(o).filter(([k, v]) => typeof k !== `symbol` && v !== undefined) as {
     [K in keyof T]-?: [K, Exclude<T[K], undefined>];
   }[Exclude<keyof T, symbol>][];

@@ -1,13 +1,7 @@
-import {
-  type APIApplicationCommand,
-  type Client,
-  type Interaction,
-  Routes,
-} from 'discord.js';
+import { type APIApplicationCommand, type Client, type Interaction, Routes } from 'discord.js';
 
-import { interactionModuleBrand } from '@/routers/symbols';
-import { entries, glob } from '@/utils';
-
+import { interactionModuleBrand } from '../routers/symbols';
+import { entries, glob } from '../utils';
 import type {
   InteractionDefinition,
   InteractionModule,
@@ -17,28 +11,21 @@ import type {
 
 export * from './types';
 
-export const createInteractionRouter = (
-  module: InteractionModuleShape,
-): InteractionModule => ({
+export const createInteractionRouter = (module: InteractionModuleShape): InteractionModule => ({
   ...module,
   [interactionModuleBrand]: true,
 });
 
-const createSingle = <T extends InteractionType>(
-  key: T,
-  interaction: InteractionDefinition<T>,
-) =>
+const createSingle = <T extends InteractionType>(key: T, interaction: InteractionDefinition<T>) =>
   createInteractionRouter({
     [key]: [interaction],
   });
 
-export const createInteractionRouterCommand = (
-  command: InteractionDefinition<`commands`>,
-) => createSingle(`commands`, command);
+export const createInteractionRouterCommand = (command: InteractionDefinition<`commands`>) =>
+  createSingle(`commands`, command);
 
-export const createInteractionRouterMenu = (
-  menu: InteractionDefinition<`menus`>,
-) => createSingle(`menus`, menu);
+export const createInteractionRouterMenu = (menu: InteractionDefinition<`menus`>) =>
+  createSingle(`menus`, menu);
 
 export const isInteractionModule = (v: unknown): v is InteractionModule =>
   v !== null && typeof v === `object` && interactionModuleBrand in v;
@@ -69,8 +56,7 @@ export const registerInteractionRouters = async (
         if (!predicateMapper[key](interaction)) return;
         // actual crisis in understanding of TS
         definition.forEach(async (v) => {
-          if (v.definition.name === interaction.commandName)
-            await v.handler(interaction as never);
+          if (v.definition.name === interaction.commandName) await v.handler(interaction as never);
         });
       });
 
@@ -81,10 +67,9 @@ export const registerInteractionRouters = async (
 
   const register = async (applicationId: string) => {
     const interactions = definitions.flat().map((v) => v.definition.toJSON());
-    const res = await client.rest.put(
-      Routes.applicationCommands(applicationId),
-      { body: interactions },
-    );
+    const res = await client.rest.put(Routes.applicationCommands(applicationId), {
+      body: interactions,
+    });
     const commands = res as APIApplicationCommand[];
     results.push(...commands);
   };
@@ -99,16 +84,12 @@ export const registerInteractionRouters = async (
   return results;
 };
 
-export const globInteractionRouters = async (
-  client: Client,
-  pattern: string,
-  baseDir?: string,
-) => {
+export const globInteractionRouters = async (client: Client, pattern: string, baseDir?: string) => {
   const discovered = await glob(pattern, baseDir);
   const valid = discovered.flatMap(({ module, path }) =>
     Object.values(module)
       .filter((v) => isInteractionModule(v))
-      .map((module) => ({ module, path })),
+      .map((interactionModule) => ({ module: interactionModule, path })),
   );
 
   await registerInteractionRouters(

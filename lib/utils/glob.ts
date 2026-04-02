@@ -1,9 +1,9 @@
 import type Module from 'node:module';
-
-import { Glob } from 'bun';
 import path from 'node:path';
 
-import { collect } from '@/utils';
+import { Glob } from 'bun';
+
+import { collect } from './async-iterator';
 
 /**
  * Finds, imports, and casts modules to T by glob
@@ -20,5 +20,12 @@ export const glob = async <T extends Module>(
   const resolved = await Promise.all(
     scanned.map((v) => import(path.resolve(dir, v)) as Promise<T>),
   );
-  return resolved.map((v, i) => ({ module: v, path: scanned[i]! }));
+  return resolved.map((v, i) => {
+    const modulePath = scanned[i];
+    if (modulePath === undefined) {
+      throw new Error(`Glob scan mismatch at index ${i}`);
+    }
+
+    return { module: v, path: modulePath };
+  });
 };

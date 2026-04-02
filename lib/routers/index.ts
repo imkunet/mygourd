@@ -1,16 +1,12 @@
 import type { Client } from 'discord.js';
 
-import {
-  type EventModule,
-  isEventModule,
-  registerEventRouters,
-} from '@/events';
+import { type EventModule, isEventModule, registerEventRouters } from '../events';
 import {
   type InteractionModule,
   isInteractionModule,
   registerInteractionRouters,
-} from '@/interactions';
-import { glob } from '@/utils';
+} from '../interactions';
+import { glob } from '../utils';
 
 type ModuleType = EventModule | InteractionModule;
 
@@ -45,7 +41,7 @@ export const globAllRouters = async (
   const valid = globbed.flat().flatMap(({ module, path }) =>
     Object.values(module)
       .filter((v) => shapeHandlers.some(({ check }) => check(v)))
-      .map((module) => ({ module: module as ModuleType, path })),
+      .map((routerModule) => ({ module: routerModule as ModuleType, path })),
   );
 
   shapeHandlers.forEach(async ({ handler }) => {

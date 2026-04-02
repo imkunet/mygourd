@@ -1,15 +1,17 @@
 {
   "name": "bot",
-  "module": "index.ts",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "module": "index.ts",
+  "dependencies": {
+    "mygourd": "link:mygourd"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "arkenv": "^0.11.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {
-    "mygourd": "link:mygourd"
-  }
+  "packageManager": "bun@1.3.11"
 }

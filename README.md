@@ -1,4 +1,4 @@
-# mygourd
+# mygourd 🏳️‍⚧️
 
 some discord utilities. requires bun though, so keep that in mind!
 
@@ -8,25 +8,21 @@ so check out this example:
 
 ```ts
 // main.ts
-import { type } from 'arktype';
 import consola from 'consola';
 import { Client } from 'discord.js';
 import { globAllRouters } from 'mygourd/routers';
-import { login, useEnv } from 'mygourd/utils';
+import { login } from 'mygourd/utils';
+import arkenv from 'arkenv';
 
-const env = useEnv({
-  BOT_TOKEN: type(/[A-Za-z.]/).configure({ actual: `` }),
+const env = arkenv({
+  BOT_TOKEN: 'string',
 });
 
 const client = new Client({
   intents: [`Guilds`, `MessageContent`, `GuildMessages`, `GuildVoiceStates`],
 });
 
-await globAllRouters(
-  client,
-  [`events/**/*.ts`, `interactions/**/*.ts`],
-  import.meta.dir,
-);
+await globAllRouters(client, [`events/**/*.ts`, `interactions/**/*.ts`], import.meta.dir);
 
 await login(client, env.BOT_TOKEN, () => {
   consola.info(`Shutting down!`);
@@ -53,9 +49,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { createInteractionRouterCommand } from 'mygourd/interactions';
 
 export const pingCommand = createInteractionRouterCommand({
-  definition: new SlashCommandBuilder()
-    .setName(`ping`)
-    .setDescription(`Pings the bot!`),
+  definition: new SlashCommandBuilder().setName(`ping`).setDescription(`Pings the bot!`),
   handler: async (event) => {
     await event.reply({
       content: `pong`,
@@ -83,24 +77,32 @@ import { lazy } from 'mygourd/utils';
 
 const commandDataCache = lazy(
   (client: Client<true>) =>
-    client.rest.get(Routes.applicationCommands(client.user.id)) as Promise<
-      APIApplicationCommand[]
-    >,
+    client.rest.get(Routes.applicationCommands(client.user.id)) as Promise<APIApplicationCommand[]>,
 );
 
 // this is an example usage case:
-const getCommandMention = async (
-  client: Client<true>,
-  name: string,
-  subcommand?: string,
-) => {
+const getCommandMention = async (client: Client<true>, name: string, subcommand?: string) => {
   const cache = await commandDataCache(client);
   const command = cache.find((c) => c.name === name);
   if (command === undefined) return `unknown`;
-  return subcommand ?
-      chatInputApplicationCommandMention(name, subcommand, command.id)
+  return subcommand
+    ? chatInputApplicationCommandMention(name, subcommand, command.id)
     : chatInputApplicationCommandMention(name, command.id);
 };
 ```
 
 if you have any ideas for a better way please do let me know
+
+### breaking changes
+
+- removed the `useEnv` feature, use the `arkenv` package instead. here's a modified example from their readme:
+
+  ```ts
+  import arkenv from 'arkenv';
+
+  const env = arkenv({
+    BOT_TOKEN: 'string',
+  });
+  ```
+
+  as a result, the dependency on arktype and consola has been removed as well. be mindful of your packages.

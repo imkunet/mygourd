@@ -5,7 +5,7 @@ import {
   SlashCommandBuilder,
 } from 'discord.js';
 
-import type { interactionModuleBrand } from '@/routers/symbols';
+import type { interactionModuleBrand } from '../routers/symbols';
 
 export type InteractionEventMapper = {
   commands: ChatInputCommandInteraction;
@@ -17,9 +17,7 @@ export type InteractionShapeMapper = {
   menus: ContextMenuCommandBuilder | SerializableShape;
 };
 
-export type InteractionType =
-  | keyof InteractionEventMapper
-  | keyof InteractionShapeMapper;
+export type InteractionType = keyof InteractionEventMapper | keyof InteractionShapeMapper;
 
 // <- //
 

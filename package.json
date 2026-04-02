@@ -6,47 +6,73 @@
     "type": "git",
     "url": "git+https://github.com/imkunet/mygourd.git"
   },
-  "module": "lib/index.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md"
+  ],
   "type": "module",
-  "scripts": {
-    "build": "bun build.ts",
-    "prepack": "bun build.ts",
-    "lint": "eslint --fix",
-    "format": "prettier -w ."
-  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
     },
     "./events": {
-      "import": "./dist/events/index.js",
-      "types": "./dist/events/index.d.ts"
+      "types": "./dist/events/index.d.mts",
+      "import": "./dist/events/index.mjs",
+      "require": "./dist/events/index.cjs",
+      "default": "./dist/events/index.mjs"
     },
     "./interactions": {
-      "import": "./dist/interactions/index.js",
-      "types": "./dist/interactions/index.d.ts"
+      "types": "./dist/interactions/index.d.mts",
+      "import": "./dist/interactions/index.mjs",
+      "require": "./dist/interactions/index.cjs",
+      "default": "./dist/interactions/index.mjs"
     },
     "./routers": {
-      "import": "./dist/routers/index.js",
-      "types": "./dist/routers/index.d.ts"
+      "types": "./dist/routers/index.d.mts",
+      "import": "./dist/routers/index.mjs",
+      "require": "./dist/routers/index.cjs",
+      "default": "./dist/routers/index.mjs"
     },
     "./utils": {
-      "import": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts"
-    }
+      "types": "./dist/utils/index.d.mts",
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.cjs",
+      "default": "./dist/utils/index.mjs"
+    },
+    "./README.md": "./README.md",
+    "./LICENSE.md": "./LICENSE.md",
+    "./package.json": "./package.json"
   },
-  "files": [
-    "dist"
-  ],
-  "devDependencies": {
-    "@hiddenability/opinionated-defaults": "^0.1.47",
-    "@types/bun": "latest",
-    "esbuild": "^0.27.2"
+  "scripts": {
+    "build": "vp pack",
+    "prepack": "vp pack",
+    "lint:fix": "vp lint --fix; vp fmt --write",
+    "prepare": "vp config"
   },
   "dependencies": {
-    "arktype": "^2.1.29",
+    "discord.js": "^14.26.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript/native-preview": "^7.0.0-dev.20260401.1",
+    "arkenv": "^0.11.0",
+    "arktype": "^2.2.0",
     "consola": "^3.4.2",
-    "discord.js": "^14.25.1"
-  }
+    "vite-plus": "latest"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "engines": {
+    "bun": ">=1.3.11"
+  },
+  "packageManager": "bun@1.3.11"
 }

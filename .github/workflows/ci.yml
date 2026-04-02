@@ -19,11 +19,12 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v4
 
-      - name: setup node
-        uses: actions/setup-node@v4
+      - name: setup viteplus
+        uses: voidzero-dev/setup-vp@v1
         with:
           node-version: '25'
           registry-url: 'https://registry.npmjs.org'
+          run-install: false
 
       - name: setup bun
         uses: oven-sh/setup-bun@v2
@@ -32,6 +33,15 @@ jobs:
 
       - name: install dependencies
         run: bun link && bun ci
+
+      - name: lint
+        run: vp lint
+
+      - name: typecheck
+        run: bunx tsgo
+
+      - name: build package
+        run: vp pack
 
       - name: release new version
         run: npm publish

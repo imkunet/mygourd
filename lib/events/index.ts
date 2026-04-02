@@ -1,8 +1,7 @@
 import type { Client } from 'discord.js';
 
-import { eventModuleBrand } from '@/routers/symbols';
-import { glob } from '@/utils';
-
+import { eventModuleBrand } from '../routers/symbols';
+import { glob } from '../utils';
 import type { EventModule, EventModuleShape } from './types';
 
 export * from './types';
@@ -22,16 +21,12 @@ export const registerEventRouters = (client: Client, modules: EventModule[]) =>
       client.on(...v);
     });
 
-export const globEventRouters = async (
-  client: Client,
-  pattern: string,
-  baseDir?: string,
-) => {
+export const globEventRouters = async (client: Client, pattern: string, baseDir?: string) => {
   const discovered = await glob(pattern, baseDir);
   const valid = discovered.flatMap(({ module, path }) =>
     Object.values(module)
       .filter((v) => isEventModule(v))
-      .map((module) => ({ module, path })),
+      .map((eventModule) => ({ module: eventModule, path })),
   );
 
   registerEventRouters(
