@@ -1,3 +1,6 @@
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import arkenv from 'arkenv';
 import consola from 'consola';
 import { Client } from 'discord.js';
@@ -12,7 +15,8 @@ const client = new Client({
   intents: [`Guilds`, `MessageContent`, `GuildMessages`, `GuildVoiceStates`],
 });
 
-await globAllRouters(client, [`events/**/*.ts`, `interactions/**/*.ts`], import.meta.dir);
+const baseDir = dirname(fileURLToPath(import.meta.url));
+await globAllRouters(client, [`events/**/*.ts`, `interactions/**/*.ts`], baseDir);
 
 await login(client, env.BOT_TOKEN, () => {
   consola.info(`Shutting down!`);

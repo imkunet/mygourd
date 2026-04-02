@@ -1,7 +1,5 @@
-import type Module from 'node:module';
+import { glob as scanGlob } from 'node:fs/promises';
 import path from 'node:path';
-
-import { Glob } from 'bun';
 
 import { collect } from './async-iterator';
 
@@ -11,12 +9,12 @@ import { collect } from './async-iterator';
  * @param baseDir The base directory to search from
  * @returns List of resolved modules and their paths
  */
-export const glob = async <T extends Module>(
+export const glob = async <T extends Record<string, unknown>>(
   pattern: string,
   baseDir?: string,
 ): Promise<{ module: T; path: string }[]> => {
   const dir = baseDir ?? process.cwd();
-  const scanned = await collect(new Glob(pattern).scan(path.join(dir)));
+  const scanned = await collect<string>(scanGlob(pattern, { cwd: dir }));
   const resolved = await Promise.all(
     scanned.map((v) => import(path.resolve(dir, v)) as Promise<T>),
   );

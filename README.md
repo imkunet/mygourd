@@ -1,6 +1,6 @@
 # mygourd 🏳️‍⚧️
 
-some discord utilities. requires bun though, so keep that in mind!
+some discord utilities.
 
 ## how it works
 
@@ -8,6 +8,9 @@ so check out this example:
 
 ```ts
 // main.ts
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import consola from 'consola';
 import { Client } from 'discord.js';
 import { globAllRouters } from 'mygourd/routers';
@@ -22,7 +25,8 @@ const client = new Client({
   intents: [`Guilds`, `MessageContent`, `GuildMessages`, `GuildVoiceStates`],
 });
 
-await globAllRouters(client, [`events/**/*.ts`, `interactions/**/*.ts`], import.meta.dir);
+const baseDir = dirname(fileURLToPath(import.meta.url));
+await globAllRouters(client, [`events/**/*.ts`, `interactions/**/*.ts`], baseDir);
 
 await login(client, env.BOT_TOKEN, () => {
   consola.info(`Shutting down!`);
