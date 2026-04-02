@@ -66,8 +66,7 @@
     "arktype": "^2.2.0",
     "consola": "^3.4.2",
     "typescript": "^6.0.2",
-    "vite-plus": "latest",
-    "vitest": "^0.1.15"
+    "vite-plus": "latest"
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
