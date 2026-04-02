@@ -32,7 +32,7 @@ jobs:
           bun-version: latest
 
       - name: install dependencies
-        run: bun link && bun ci
+        run: bun link && vp i
 
       - name: lint
         run: vp lint
