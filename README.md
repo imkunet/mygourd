@@ -109,4 +109,4 @@ if you have any ideas for a better way please do let me know
   });
   ```
 
-  as a result, the dependency on arktype and consola has been removed as well. be mindful of your packages.
+  as a result, the dependency on arktype and consola has been removed as well, so you will need to install arktype yourself if you use arkenv. be mindful of your packages.
