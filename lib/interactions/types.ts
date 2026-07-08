@@ -1,4 +1,5 @@
-import {
+import type {
+  AutocompleteInteraction,
   ChatInputCommandInteraction,
   ContextMenuCommandBuilder,
   ContextMenuCommandInteraction,
@@ -24,7 +25,11 @@ export type InteractionType = keyof InteractionEventMapper | keyof InteractionSh
 export type InteractionDefinition<T extends InteractionType> = {
   definition: InteractionShapeMapper[T];
   handler: (_event: InteractionEventMapper[T]) => unknown;
-};
+} & (T extends `commands`
+  ? {
+      autocompleteHandler?: (_event: AutocompleteInteraction) => unknown;
+    }
+  : object);
 
 export type InteractionModule = InteractionModuleShape & {
   [interactionModuleBrand]: true;

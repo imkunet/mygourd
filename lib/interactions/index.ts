@@ -1,7 +1,7 @@
-import { type APIApplicationCommand, type Client, type Interaction, Routes } from 'discord.js';
+import { type APIApplicationCommand, type Client, Routes } from 'discord.js';
 
 import { interactionModuleBrand } from '../routers/symbols';
-import { entries, glob } from '../utils';
+import { glob } from '../utils';
 import type {
   InteractionDefinition,
   InteractionModule,
@@ -30,43 +30,67 @@ export const createInteractionRouterMenu = (menu: InteractionDefinition<`menus`>
 export const isInteractionModule = (v: unknown): v is InteractionModule =>
   v !== null && typeof v === `object` && interactionModuleBrand in v;
 
-const predicateMapper = {
-  commands: (event: Interaction) => event.isChatInputCommand(),
-  menus: (event: Interaction) => event.isContextMenuCommand(),
-} as const;
+type RegisteredInteractionDefinitions = {
+  commands: InteractionDefinition<`commands`>[];
+  menus: InteractionDefinition<`menus`>[];
+};
+
+const collectDefinitions = (modules: InteractionModule[]): RegisteredInteractionDefinitions =>
+  modules.reduce<RegisteredInteractionDefinitions>(
+    (definitions, module) => {
+      definitions.commands.push(...(module.commands ?? []));
+      definitions.menus.push(...(module.menus ?? []));
+      return definitions;
+    },
+    { commands: [], menus: [] },
+  );
+
+const findDefinition = <T extends InteractionType>(
+  definitions: InteractionDefinition<T>[],
+  commandName: string,
+) => definitions.find((v) => v.definition.name === commandName);
 
 /**
- * This is probably the most scuffed function here
+ * Registers interaction definitions with Discord and wires their handlers
+ * to matching interaction events.
  * @param client
  * @param modules
  * @returns An eventually populated list of APIApplicationCommand,
- * but you will not know when this is populated. Have fun with that!
- * Please only use this if you don't have any other mechanism to
- * retrieve this data.
+ * but it will not include delayed clientReady registration results
+ * until after clientReady has fired.
  */
 export const registerInteractionRouters = async (
   client: Client,
   modules: InteractionModule[],
 ): Promise<APIApplicationCommand[]> => {
-  const definitions = modules
-    .flatMap((v) => entries(v))
-    .map(([key, definition]) => {
-      client.setMaxListeners(client.getMaxListeners() + 1);
-      client.on(`interactionCreate`, (interaction) => {
-        if (!predicateMapper[key](interaction)) return;
-        // actual crisis in understanding of TS
-        definition.forEach(async (v) => {
-          if (v.definition.name === interaction.commandName) await v.handler(interaction as never);
-        });
-      });
+  const definitions = collectDefinitions(modules);
 
-      return definition;
-    });
+  client.setMaxListeners(client.getMaxListeners() + 1);
+  client.on(`interactionCreate`, async (interaction) => {
+    if (interaction.isAutocomplete()) {
+      const command = findDefinition(definitions.commands, interaction.commandName);
+      await command?.autocompleteHandler?.(interaction);
+      return;
+    }
+
+    if (interaction.isChatInputCommand()) {
+      const command = findDefinition(definitions.commands, interaction.commandName);
+      await command?.handler(interaction);
+      return;
+    }
+
+    if (interaction.isContextMenuCommand()) {
+      const menu = findDefinition(definitions.menus, interaction.commandName);
+      await menu?.handler(interaction);
+    }
+  });
 
   const results: APIApplicationCommand[] = [];
 
   const register = async (applicationId: string) => {
-    const interactions = definitions.flat().map((v) => v.definition.toJSON());
+    const interactions = [...definitions.commands, ...definitions.menus].map((v) =>
+      v.definition.toJSON(),
+    );
     const res = await client.rest.put(Routes.applicationCommands(applicationId), {
       body: interactions,
     });
@@ -74,8 +98,6 @@ export const registerInteractionRouters = async (
     results.push(...commands);
   };
 
-  // this has to be cursed luckily I'm the only one using this library...
-  // right?
   const applicationId = client?.user?.id;
   if (applicationId) await register(applicationId);
 

@@ -60,13 +60,13 @@
     "discord.js": "^14.26.4"
   },
   "devDependencies": {
-    "@types/node": "^26.1.0",
-    "@typescript/native-preview": "^7.0.0-dev.20260701.1",
+    "@types/node": "^26.1.1",
+    "@typescript/native-preview": "^7.0.0-dev.20260707.2",
     "arkenv": "^0.12.2",
-    "arktype": "^2.2.1",
+    "arktype": "^2.2.3",
     "consola": "^3.4.2",
     "typescript": "^6.0.3",
-    "vite-plus": "^0.2.1"
+    "vite-plus": "^0.2.3"
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
